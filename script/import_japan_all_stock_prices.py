@@ -10,7 +10,8 @@ import slackweb
 import configparser
 
 
-config_path = 'config/account.ini'
+BASE_DIR = '/usr/local/script/'
+config_path = BASE_DIR + 'config/account.ini'
 config = configparser.ConfigParser()
 config.read(config_path, 'UTF-8')
 
@@ -20,7 +21,6 @@ DB_PASSWORD = config.get('db', 'DB_PASSWORD')
 DB_HOST = config.get('db', 'DB_HOST')
 DB_DATABASE = config.get('db', 'DB_DATABASE')
 TABLE = 'japan_all_stock_prices'
-BASE_DIR = '/usr/local/script/'
 CSV_FILE_DIR = BASE_DIR + "/../data/japan_all_stock_prices/"
 
 args = sys.argv
