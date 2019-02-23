@@ -1,0 +1,11 @@
+###### Requirements with Version Specifiers ######
+certifi==2018.10.15
+chardet==3.0.4
+idna==2.7
+mysql-connector-python==8.0.13
+protobuf==3.6.1
+python-dateutil==2.7.5
+requests==2.20.0
+six==1.11.0
+slackweb==1.0.5
+urllib3==1.24.1
