@@ -79,10 +79,23 @@ if __name__ == '__main__':
                     high_price, low_price, day_before_ratio, day_before_ratio_percentage,
                     last_day_closing_price))
         except mysql.connector.Error as e:
-            print(e)
+            log.error(e)
             conn.close()
 
         conn.commit()
         conn.close()
+
+        # テーブルINSERT件数確認
+        try:
+            conn = mysql.connector.connect(user=DB_USER, password=DB_PASSWORD, host=DB_HOST, database=DB_DATABASE)
+            cursor = conn.cursor()
+            count_query = """SELECT dt, COUNT(*) FROM %s.%s WHERE dt = '%s' GROUP BY dt""" % (DB_DATABASE, TABLE, TODAY)
+            cursor.execute(count_query)
+            result = cursor.fetchone()
+            result_word = "処理日時：%s 取得件数：%s" % (result[0], result[1])
+            slack.notify(text="日経225&TOPIXテーブルインポート\n" + result_word)
+        except mysql.connector.Error as e:
+            log.error(e)
+            conn.close()
 
         log.info('日経225&TOPIXテーブルインポート処理 : 終了')
