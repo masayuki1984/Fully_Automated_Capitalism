@@ -115,7 +115,7 @@ if __name__ == '__main__':
             cursor.execute(count_query)
             result = cursor.fetchone()
             result_word = "処理日時：%s 取得件数：%s" % (result[0], result[1])
-            slack.notify(text="ETFテーブルインポート\n" + result_word)
+            slack.notify(text="REITテーブルインポート\n" + result_word)
         except mysql.connector.Error as e:
             log.error(e)
             conn.close()
