@@ -34,7 +34,7 @@ if __name__ == '__main__':
     if len(args) < 2:
         TODAY = datetime.date.today()
         one_month_ago = TODAY - relativedelta(months=1)
-        target_month = str(one_month_ago.year) + str(one_month_ago.month)
+        target_month = str(one_month_ago.year) + str(one_month_ago.month).zfill(2)
     else:
         target_month = args[1]
 
