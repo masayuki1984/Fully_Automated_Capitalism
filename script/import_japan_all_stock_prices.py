@@ -11,15 +11,19 @@ import configparser
 
 
 BASE_DIR = '/usr/local/script/'
-config_path = BASE_DIR + 'config/account.ini'
-config = configparser.ConfigParser()
-config.read(config_path, 'UTF-8')
+account = BASE_DIR + 'config/account.ini'
+account_config = configparser.ConfigParser()
+account_config.read(account, 'UTF-8')
+
+path = BASE_DIR + 'config/path.ini'
+path_config = configparser.COnfigParser()
+path_config.read(path, 'UTF-8')
 
 # Constants
-DB_USER = config.get('db', 'DB_USER')
-DB_PASSWORD = config.get('db', 'DB_PASSWORD')
-DB_HOST = config.get('db', 'DB_HOST')
-DB_DATABASE = config.get('db', 'DB_DATABASE')
+DB_USER = account_config.get('db', 'DB_USER')
+DB_PASSWORD = account_config.get('db', 'DB_PASSWORD')
+DB_HOST = account_config.get('db', 'DB_HOST')
+DB_DATABASE = account_config.get('db', 'DB_DATABASE')
 TABLE = 'japan_all_stock_prices'
 CSV_FILE_DIR = BASE_DIR + "/../data/japan_all_stock_prices/"
 
