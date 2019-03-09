@@ -98,9 +98,11 @@ def get_industry_type(industry_name):
         return 32
     elif industry_name == 'サービス':
         return 33
-    if industry_name == 'ETF':
+    elif industry_name == 'ETF':
         return 34
     elif industry_name == 'ETN':
         return 35
+    elif industry_name == 'REIT':
+        return 36
     else:
         return 'null'
