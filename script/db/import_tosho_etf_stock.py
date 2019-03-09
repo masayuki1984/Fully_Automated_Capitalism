@@ -1,6 +1,7 @@
 #coding:utf-8
 
-import logging_config
+import db_config
+from functions import exchange_code
 import logging
 import datetime
 import csv
@@ -11,44 +12,33 @@ import configparser
 
 
 BASE_DIR = '/usr/local/script/'
-config_path = BASE_DIR + 'config/account.ini'
-config = configparser.ConfigParser()
-config.read(config_path, 'UTF-8')
+account = BASE_DIR + 'config/account.ini'
+account_config = configparser.ConfigParser()
+account_config.read(account, 'UTF-8')
+
+path = BASE_DIR + 'config/path.ini'
+path_config = configparser.ConfigParser()
+path_config.read(path, 'UTF-8')
 
 # Constants
-DB_USER = config.get('db', 'DB_USER')
-DB_PASSWORD = config.get('db', 'DB_PASSWORD')
-DB_HOST = config.get('db', 'DB_HOST')
-DB_DATABASE = config.get('db', 'DB_DATABASE')
+DB_USER = account_config.get('db', 'DB_USER')
+DB_PASSWORD = account_config.get('db', 'DB_PASSWORD')
+DB_HOST = account_config.get('db', 'DB_HOST')
+DB_DATABASE = account_config.get('db', 'DB_DATABASE')
 TABLE = 'tosho_etf_stock_prices'
-CSV_FILE_DIR = BASE_DIR + "/../data/tosho_etf_stock_prices/"
+CSV_FILE_DIR = path_config.get('csv_path', 'data_base') + path_config.get('csv_path', 'tosho_etf_stock_prices')
 
 args = sys.argv
-
-def get_stock_exchange_code(stock_exchange_name):
-    if stock_exchange_name == '東証':
-        return 13
-    else:
-        return 'null'
-
-
-def get_industry_type(industry_name):
-    if industry_name == 'ETF':
-        return 34
-    elif industry_name == 'ETN':
-        return 35
-    else:
-        return 'null'
-
 
 if __name__ == '__main__':
     # モジュール名でロガーを生成する(メインモジュールは 名前が '__main__' になる)
     log = logging.getLogger(__name__)
     # Slack Incoming webhook設定
-    slack_log_url = config.get('slack', 'slack_log_url')
+    slack_log_url = account_config.get('slack', 'slack_log_url')
     slack = slackweb.Slack(url=slack_log_url)
 
     log.info('ETFテーブルインポート処理 : 開始')
+
     # 対象の日付を設定（引数でYYYYMMDD形式で日付を入れるとその日付のファイルを対象とする）
     if len(args) < 2:
         TODAY = datetime.date.today()
@@ -77,8 +67,8 @@ if __name__ == '__main__':
                 security_code = row[0] if row[0] != '-' else 'null'
                 dt = file_name_date_part
                 company_name = row[1] if row[1] != '-' else 'null'
-                stock_exchange_code = get_stock_exchange_code(row[2])
-                industry_type = get_industry_type(row[3])
+                stock_exchange_code = exchange_code.get_stock_exchange_code(row[2])
+                industry_type = exchange_code.get_industry_type(row[3])
                 opening_price = row[9] if row[9] != '-' else 'null'
                 closing_price = row[5] if row[5] != '-' else 'null'
                 high_price = row[10] if row[10] != '-' else 'null'

@@ -25,6 +25,8 @@ def get_stock_exchange_code(stock_exchange_name):
         return 11
     elif stock_exchange_name == '福証QB':
         return 12
+    elif stock_exchange_name == '東証':
+        return 13
     else:
         return 'null'
 
@@ -96,5 +98,9 @@ def get_industry_type(industry_name):
         return 32
     elif industry_name == 'サービス':
         return 33
+    if industry_name == 'ETF':
+        return 34
+    elif industry_name == 'ETN':
+        return 35
     else:
         return 'null'
