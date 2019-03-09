@@ -104,5 +104,13 @@ def get_industry_type(industry_name):
         return 35
     elif industry_name == 'REIT':
         return 36
+    elif industry_name == '優先株':
+        return 37
+    elif industry_name == 'カントリーファンド':
+        return 38
+    elif industry_name == 'インフラファンド':
+        return 39
+    elif industry_name == 'ベンチャーファンド':
+        return 40
     else:
         return 'null'
