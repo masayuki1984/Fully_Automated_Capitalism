@@ -97,12 +97,46 @@ if __name__ == '__main__':
             end_date=end_day)
         )
         monthly_average_rate_of_return_result =  cursor.fetchall()
-        print(monthly_average_rate_of_return_result)
+
+        # 「monthly_average_rate_of_return」テーブルにINSERTする
+        # 全件Bulk InsertするとINSERT文の長さ制限に掛かるので100件ずつINSERTする
+        continue_flag = True
+        while(continue_flag):
+            insert_query = '''INSERT INTO {DB_NAME}.{TABLE_NAME} 
+                (security_code, company_name, target_month, start_closing_price, end_closing_price, monthly_average_rate_of_return)
+                VALUES '''.format(
+                DB_NAME=DB_DATABASE,
+                TABLE_NAME=OUTPUT_TABLE
+            )
+            target_record_count = len(monthly_average_rate_of_return_result)
+            if target_record_count < 100:
+                record_count = target_record_count
+                continue_flag = False
+            else:
+                record_count = 100
+
+            for _ in range(record_count):
+                record = monthly_average_rate_of_return_result.pop()
+                insert_block = "({SC}, '{company_name}', '{month}', {start_price}, {end_price}, {value}),".format(
+                    SC=record[0],
+                    company_name=record[1],
+                    month=record[2],
+                    start_price=record[3],
+                    end_price=record[4],
+                    value=record[5]
+                )
+                insert_query += insert_block
+            insert_query = insert_query[:-1] + ';'
+            cursor.execute(insert_query)
+            conn.commit()
     except mysql.connector.Error as e:
         log.error(e)
+        slack.notify(text="【ERROR】統計処理 月次平均収益率 算出：異常終了")
         conn.close()
         sys.exit(1)
 
+    log.info('統計処理 月次平均収益率 算出 : 終了')
+    slack.notify(text="月次平均収益率 計算処理正常終了")
     conn.close()
 
 
