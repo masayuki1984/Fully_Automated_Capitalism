@@ -1,0 +1,22 @@
+CREATE TABLE rwsoa_japan_stock.japan_all_stock_data(
+    security_code INTEGER,
+    dt DATE,
+    company_name VARCHAR(50),
+    stock_exchange_code INTEGER,
+    industry_type INTEGER,
+    market_capitalization INTEGER,
+    outstanding_shares INTEGER,
+    dividend_yield DOUBLE,
+    dividends_per_share DOUBLE,
+    per DOUBLE,
+    pbr DOUBLE,
+    eps DOUBLE,
+    bps DOUBLE,
+    minimum_purchase_amount INTEGER,
+    share_unit INTEGER,
+    high_price_date DATE,
+    yearly_high_price DOUBLE,
+    low_price_date DATE,
+    yearly_low_price DOUBLE,
+    PRIMARY KEY (security_code, dt)
+);
