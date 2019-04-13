@@ -83,15 +83,22 @@ if __name__ == '__main__':
                 yearly_high_price = row[15] if row[15] != '-' else 'null'
                 low_price_date = row[16] if row[16] != '-' else 'null'
                 yearly_low_price = row[17] if row[17] != '-' else 'null'
-                cursor.execute('''INSERT INTO %s.%s (security_code, dt, company_name,
-                               stock_exchange_code, industry_type, opening_price, closing_price, high_price, low_price,
-                               day_before_ratio, day_before_ratio_percentage, last_day_closing_price, volume,
-                               trading_value, market_capitalization, price_range_lower_limit, price_range_upper_limit)
-                               VALUES(%s, '%s', "%s", %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                               ''' % (DB_DATABASE, TABLE, security_code, dt, company_name, stock_exchange_code, industry_type,
-                                      market_capitalization, outstanding_shares, dividend_yield, dividends_per_share,
-                                      per, pbr, eps, bps, minimum_purchase_amount, share_unit, high_price_date,
-                                      yearly_high_price, low_price_date, yearly_low_price))
+                cursor.execute('''
+                        INSERT INTO {DB}.{TABLE} (security_code, dt, company_name, stock_exchange_code, industry_type,
+                            market_capitalization, outstanding_shares, dividend_yield, dividends_per_share,
+                            per, pbr, eps, bps, minimum_purchase_amount, share_unit, high_price_date, yearly_high_price,
+                            low_price_date, yearly_low_price)
+                        VALUES({sc}, '{dt}', "{company_name}", {stock_exchange_code}, {industry_type}, {mc}, 
+                            {out_shares}, {dividend_yield}, {dividends_per_share}, {per}, {pbr}, {eps}, {bps}, 
+                            {minimum_purchase_amount}, {share_unit}, '{high_price_date}', {yearly_high_price}, 
+                            '{low_price_date}', {yearly_low_price});
+                '''.format(DB=DB_DATABASE, TABLE=TABLE, sc=security_code, dt=dt, company_name=company_name,
+                           stock_exchange_code=stock_exchange_code, industry_type=industry_type, mc=market_capitalization,
+                           out_shares=outstanding_shares, dividend_yield=dividend_yield, dividends_per_share=dividends_per_share,
+                           per=per, pbr=pbr, eps=eps, bps=bps, minimum_purchase_amount=minimum_purchase_amount,
+                           share_unit=share_unit, high_price_date=high_price_date, yearly_high_price=yearly_high_price,
+                           low_price_date=low_price_date, yearly_low_price=yearly_low_price)
+                )
         except mysql.connector.Error as e:
             log.error(e)
             conn.close()
