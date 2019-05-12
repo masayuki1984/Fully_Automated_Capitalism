@@ -8,16 +8,23 @@ import datetime
 from dateutil.relativedelta import relativedelta
 import slackweb
 import configparser
+import compression_config
+import logging
 
 
 # constants
 args = sys.argv
-BASE_DIR = '/usr/local/script/compression_file/'
-CONFIG_DIR = BASE_DIR + "../config"
-config_path = CONFIG_DIR + '/account.ini'
-config = configparser.ConfigParser()
-config.read(config_path, 'UTF-8')
-TARGET_DIR = BASE_DIR + "../../data/japan_all_stock_prices/"
+BASE_DIR = '/usr/local/script/'
+
+account = BASE_DIR + 'config/account.ini'
+account_config = configparser.ConfigParser()
+account_config.read(account, 'UTF-8')
+
+path = BASE_DIR + 'config/path.ini'
+path_config = configparser.ConfigParser()
+path_config.read(path, 'UTF-8')
+
+TARGET_DIR = path_config.get('csv_path', 'data_base') + path_config.get('csv_path', 'japan_all_stock_prices')
 FILE_NAME_PREFIX = 'japan-all-stock-prices_'
 
 def move_glob(dst_path, pathname, recursive=True):
@@ -26,8 +33,11 @@ def move_glob(dst_path, pathname, recursive=True):
 
 
 if __name__ == '__main__':
+    # モジュール名でロガーを生成する(メインモジュールは 名前が '__main__' になる)
+    log = logging.getLogger(__name__)
+
     # Slack Incoming webhook設定
-    slack_log_url = config.get('slack', 'slack_log_url')
+    slack_log_url = account_config.get('slack', 'slack_log_url')
     slack = slackweb.Slack(url=slack_log_url)
 
     # 対象の年月を設定
@@ -56,8 +66,9 @@ if __name__ == '__main__':
             shutil.rmtree(move_to)
 
     except shutil.Error as e:
-        print(e)
+        log.error('日本株全銘柄 CSVファイル圧縮月次処理失敗')
         sys.exit(1)
 
+    log.info('日本株全銘柄 CSVファイル圧縮月次処理成功')
     slack.notify(text="日本株全銘柄 CSVファイル圧縮月次処理(" + target_month + ")：正常終了")
     sys.exit(0)
