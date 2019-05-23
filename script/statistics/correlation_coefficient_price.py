@@ -51,8 +51,10 @@ if __name__ == '__main__':
         conn = mysql.connector.connect(user=DB_USER, password=DB_PASSWORD, host=DB_HOST, database=DB_DATABASE)
         cursor = conn.cursor()
 
+        # 日経225の前日比(終値)のパーセンテージを取得
         cursor.execute('''
                 SELECT
+                    dt,
                     day_before_ratio_percentage
                 FROM
                     {DB_NAME}.{TABLE_NAME}
@@ -67,11 +69,50 @@ if __name__ == '__main__':
             target_year=TARGET_MONTH[:4],
             target_month=TARGET_MONTH[4:])
         )
-        nikkei_225_day_before_ratio_list = list(chain.from_iterable(cursor.fetchall()))
-        #nikkei_225_day_before_ratio_list = cursor.fetchall()
-        print(nikkei_225_day_before_ratio_list)
-        #opening_day = opening_and_end_day[0][0]
-        #end_day = opening_and_end_day[0][1]
+        nikkei_225_day_before_ratio_list = list(cursor.fetchall())
+
+        # 各株式の前日比(終値)のパーセンテージを取得
+        cursor.execute('''
+                SELECT
+                    security_code
+                FROM
+                    {DB_NAME}.{TABLE_NAME}
+                WHERE
+                    dt LIKE \'{target_year}-{target_month}-%\'
+                GROUP BY
+                    security_code;
+        '''.format(
+            DB_NAME=DB_DATABASE,
+            TABLE_NAME=INPUT_TABLE_ALL_STOCK_PRICES,
+            target_year=TARGET_MONTH[:4],
+            target_month=TARGET_MONTH[4:])
+        )
+        target_sc = list(chain.from_iterable(cursor.fetchall()))
+
+        target_sc_dict = dict()
+        for sc in target_sc:
+            target_sc_day_before_ratio_list = list()
+            cursor.execute('''
+                    SELECT
+                        dt,
+                        day_before_ratio_percentage
+                    FROM
+                        {DB_NAME}.{TABLE_NAME}
+                    WHERE
+                        dt LIKE \'{target_year}-{target_month}-%\'
+                    AND
+                        security_code = {SC}
+                    ORDER BY dt;
+            '''.format(
+                DB_NAME=DB_DATABASE,
+                TABLE_NAME=INPUT_TABLE_ALL_STOCK_PRICES,
+                target_year=TARGET_MONTH[:4],
+                target_month=TARGET_MONTH[4:],
+                SC=sc)
+            )
+            target_sc_day_before_ratio_list.append(cursor.fetchall())
+            target_sc_dict[sc] = target_sc_day_before_ratio_list
+        
 
     except mysql.connector.Error as e:
         log.error(e)
