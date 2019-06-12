@@ -8,7 +8,7 @@ import mysql.connector
 import sys
 import datetime
 from itertools import chain
-import numpy as np
+import pandas as pd
 from dateutil.relativedelta import relativedelta
 
 
@@ -71,6 +71,11 @@ if __name__ == '__main__':
         )
         nikkei_225_day_before_ratio_list = list(cursor.fetchall())
 
+        # 各タプルから日付部分を抽出しリストに格納、同時に値部分のみ抽出してSeriesにする
+        nikkei_225_days = [days_data[0] for days_data in nikkei_225_day_before_ratio_list]
+        tmp_nikkei_value = [days_data[1] for days_data in nikkei_225_day_before_ratio_list]
+        nikkei_value = pd.Series(tmp_nikkei_value)
+
         # 各株式の前日比(終値)のパーセンテージを取得
         cursor.execute('''
                 SELECT
@@ -91,7 +96,6 @@ if __name__ == '__main__':
 
         target_sc_dict = dict()
         for sc in target_sc:
-            target_sc_day_before_ratio_list = list()
             cursor.execute('''
                     SELECT
                         dt,
@@ -110,12 +114,43 @@ if __name__ == '__main__':
                 target_month=TARGET_MONTH[4:],
                 SC=sc)
             )
-            target_sc_day_before_ratio_list.append(cursor.fetchall())
-            target_sc_dict[sc] = target_sc_day_before_ratio_list
-        
+            target_sc_dict[sc] = cursor.fetchall()
 
+        # INSERT用のクエリ文
+        insert_query = '''INSERT INTO {DB_NAME}.{TABLE_NAME} 
+                (security_code, target_month, corr_coef_day_before_ratio_percentage)
+                VALUES '''.format(
+                DB_NAME=DB_DATABASE,
+                TABLE_NAME=OUTPUT_TABLE
+        )
+
+        for sc_code in target_sc_dict.keys():
+            sc_days = [sc[0] for sc in target_sc_dict[sc_code]]
+            if nikkei_225_days == sc_days:
+                tmp_sc_value = [sc[1] for sc in target_sc_dict[sc_code]]
+                sc_value = pd.Series(tmp_sc_value)
+
+                corr_coef = nikkei_value.corr(sc_value)
+                # 相関係数を計算した結果NaNだった場合にはスキップする
+                if pd.isnull(corr_coef):
+                    continue
+                insert_block = "({SC}, '{target_month}', {corr_coef_day_before_ratio_percentage}),".format(
+                    SC=sc_code,
+                    target_month=TARGET_MONTH,
+                    corr_coef_day_before_ratio_percentage=corr_coef
+                )
+                insert_query += insert_block
+            else:
+                log.warn("日付欠損あり：" + str(sc_code))
+        insert_query = insert_query[:-1] + ';'
+        cursor.execute(insert_query)
+        conn.commit()
     except mysql.connector.Error as e:
         log.error(e)
         slack.notify(text="【ERROR】統計処理 日経平均株価との相関係数 算出：異常終了")
         conn.close()
         sys.exit(1)
+
+    log.info('統計処理 日経平均株価との相関係数 算出 : 終了')
+    slack.notify(text="日経平均株価との相関係数 計算処理正常終了")
+    conn.close()
