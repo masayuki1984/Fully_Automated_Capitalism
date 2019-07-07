@@ -80,5 +80,11 @@ if __name__ == "__main__":
             slack.notify(text="【ERROR】ConoHa 告知情報取得処理失敗しました。ログを確認してください。")
             sys.exit(1)
 
+    # 未読の告知が0件の場合は処理を終了させる
+    if not title_list:
+        slack.notify(text="現在、未読の「ConoHaお知らせ」はありません。")
+        log.info('ConoHa告知一覧取得 : 終了')
+        sys.exit(0)
+
     slack.notify(text='\n'.join(title_list))
     log.info('ConoHa告知一覧取得 : 終了')
