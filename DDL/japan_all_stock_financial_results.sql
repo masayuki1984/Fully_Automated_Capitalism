@@ -1,0 +1,20 @@
+CREATE TABLE rwsoa_japan_stock.japan_all_stock_financial_results(
+    security_code INTEGER,
+    target_month VARCHAR(6),
+    company_name VARCHAR(50),
+    settlement_period DATE,
+    main_earnings_announcement_day DATE,
+    sales_amount INTEGER,
+    operating_income INTEGER,
+    ordinary_profit INTEGER,
+    net_income INTEGER,
+    total_asset INTEGER,
+    net_worth INTEGER,
+    capital INTEGER,
+    interest_bearing_debt INTEGER,
+    capital_adequacy_ratio DOUBLE,
+    ROE DOUBLE,
+    ROA DOUBLE,
+    issued_shares INTEGER,
+    PRIMARY KEY (security_code, target_month)
+);

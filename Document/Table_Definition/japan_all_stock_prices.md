@@ -6,6 +6,10 @@
     - rwsoa_japan_stock
 - テーブル名
     - 株価一覧表時系列データ
+- データ提供元
+    - KABU+：株価一覧表
+- データソース
+    - japan-all-stock-prices_{YYYYMMDD}.csv
 
 # 項目属性
 
