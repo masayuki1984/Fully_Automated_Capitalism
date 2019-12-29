@@ -18,7 +18,7 @@
 |1 |security_code |証券コード |int(11) |○ |○ |0 | |
 |2 |target_month |日付 |varchar(6) |○ |○ | |YYYYMM |
 |3 |company_name |会社名 |varchar(50) | | | | |
-|4 |settlement_period |決算期 |date) | | | | |
+|4 |settlement_period |決算期 |varchar(7)) | | | | |
 |5 |main_earnings_announcement_day |決算発表日（本決算） |date | | | | |
 |6 |sales_amount |売上高（百万円） |double | | | | |
 |7 |operating_income |営業利益（百万円） |double | | | | |

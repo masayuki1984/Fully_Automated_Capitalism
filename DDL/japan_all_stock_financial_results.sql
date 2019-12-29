@@ -2,7 +2,7 @@ CREATE TABLE rwsoa_japan_stock.japan_all_stock_financial_results(
     security_code INTEGER,
     target_month VARCHAR(6),
     company_name VARCHAR(50),
-    settlement_period DATE,
+    settlement_period VARCHAR(6),
     main_earnings_announcement_day DATE,
     sales_amount INTEGER,
     operating_income INTEGER,
